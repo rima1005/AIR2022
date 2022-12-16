@@ -1,8 +1,12 @@
 import torch
+from RedditApiWrapper import RedditApiWrapper
 
 
 def main():
-    print("Test")
+    api = RedditApiWrapper()
+    for submission in api.getNewSubmissions("conspiratard", limit=20):
+        print(submission.title)
+
     pass
 
 
