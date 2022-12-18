@@ -1,4 +1,6 @@
 import praw
+from DataAdapter import convert_to_pandas
+import Utils
 
 
 class RedditApiWrapper(object):
@@ -20,9 +22,10 @@ class RedditApiWrapper(object):
         for submission in subreddit.new(limit=limit):
             submissions.append(submission)
 
-        print('{} newest submissions for {} retrieved'.format(len(submissions), subreddit_name))
+        if Utils.debug:
+            print('{} newest submissions for {} retrieved'.format(len(submissions), subreddit_name))
 
-        return submissions
+        return convert_to_pandas(submissions)
 
     def getHotSubmissions(self, subreddit_name, limit=100):
         submissions = []
@@ -32,6 +35,10 @@ class RedditApiWrapper(object):
         for submission in subreddit.hot(limit=limit):
             submissions.append(submission)
 
-        print('{} hottest submissions for {} retrieved'.format(len(submissions), subreddit_name))
+        if Utils.debug:
+            print('{} hottest submissions for {} retrieved'.format(len(submissions), subreddit_name))
 
-        return submissions
+        return convert_to_pandas(submissions)
+
+    def getInfoByFullname(self, fullnames):
+        return self.reddit.info(fullnames=fullnames)

@@ -1,11 +1,12 @@
 import torch
 from RedditApiWrapper import RedditApiWrapper
+import pandas as pd
 
 
 def main():
     api = RedditApiWrapper()
-    for submission in api.getNewSubmissions("conspiratard", limit=20):
-        print(submission.title)
+    data = api.getNewSubmissions('conspiratard', 50)
+    print(data.head(3))
 
     pass
 
