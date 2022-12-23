@@ -2,7 +2,6 @@ import praw
 from DataAdapter import convert_to_pandas
 import Utils
 
-
 class RedditApiWrapper(object):
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -10,7 +9,7 @@ class RedditApiWrapper(object):
         return cls.instance
 
     def __init__(self):
-        self.reddit = praw.Reddit(client_id='JnIW8tASkO5FwWzwu-wjdA', client_secret='HS8pQZh-AMjYQ6KHdbPOzzR2XpKUDg',
+        self.reddit = praw.Reddit(client_id=Utils.reddit_client_id, client_secret=Utils.reddit_client_secret,
                                   redirect_uri='http://www.example.com/unused/redirect/uri', user_agent='agent')
         assert self.reddit.read_only
 
