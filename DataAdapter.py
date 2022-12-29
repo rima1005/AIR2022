@@ -45,10 +45,17 @@ def convert_to_pandas(submissions: list):
         # comments.append(submission.comments)
         num_comments.append(submission.num_comments)
         author = submission.author
-        author_ids.append(author.id)
-        author_names.append(author.name)
-        # author_submissions.append(author.submissions)
-        # author_comments.append(author.comments)
+        if submission.removed_by_category in ('author', 'moderator', 'copyright_takedown', 'reddit', 'deleted') or author is None:
+            print("[DELETED REDDITOR]")
+            author_ids.append("none")
+            author_names.append("none")
+        else:
+            print("[Redditor] " + str(author.name))
+            author_ids.append("none")
+            # author_ids.append(author.id)
+            author_names.append(author.name)
+    # author_submissions.append(author.submissions)
+    # author_comments.append(author.comments)
 
     submission_df[Utils.col_id] = ids
     submission_df[Utils.col_name] = names

@@ -32,8 +32,10 @@ def main():
     api = RedditApiWrapper()
 
     # get n newest submission from r/***
-    data = api.getNewSubmissions('conspiratard', 3)
-
+    subreddits = ["conspiracy", "conspiracytheories", "skeptic", "actualconspiracies"]
+    data = api.getNewSubmissions(subreddits[0], 5000)
+    print(data)
+    data.to_csv("dataframes/praw_submissions.csv")
     if Utils.debug:
         print(data[Utils.col_title])
 
