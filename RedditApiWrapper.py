@@ -13,7 +13,7 @@ class RedditApiWrapper(object):
                                   redirect_uri='http://www.example.com/unused/redirect/uri', user_agent='agent')
         assert self.reddit.read_only
 
-    def getNewSubmissions(self, subreddit_name, limit=100):
+    def getNewSubmissions(self, subreddit_name, start_date, limit):
         submissions = []
 
         subreddit = self.reddit.subreddit(subreddit_name)
@@ -24,9 +24,9 @@ class RedditApiWrapper(object):
         if Utils.debug:
             print('{} newest submissions for {} retrieved'.format(len(submissions), subreddit_name))
 
-        return convert_to_pandas(submissions)
+        return convert_to_pandas(submissions, start_date)
 
-    def getHotSubmissions(self, subreddit_name, limit=100):
+    def getHotSubmissions(self, subreddit_name, start_date, limit):
         submissions = []
 
         subreddit = self.reddit.subreddit(subreddit_name)
@@ -37,7 +37,7 @@ class RedditApiWrapper(object):
         if Utils.debug:
             print('{} hottest submissions for {} retrieved'.format(len(submissions), subreddit_name))
 
-        return convert_to_pandas(submissions)
+        return convert_to_pandas(submissions, start_date)
 
     def getInfoByFullname(self, fullnames):
         return self.reddit.info(fullnames=fullnames)

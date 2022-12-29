@@ -4,7 +4,7 @@ import RedditApiWrapper
 import Utils
 
 
-def convert_to_pandas(submissions: list):
+def convert_to_pandas(submissions: list, start_date):
     submission_df = pd.DataFrame(columns=[Utils.col_id,
                                           Utils.col_name,
                                           Utils.col_created,
@@ -34,6 +34,10 @@ def convert_to_pandas(submissions: list):
     for count, submission in enumerate(infos):
         if Utils.debug:
             print(F"Collecting data ... [{count + 1} / {len(submissions)}]")
+        # Manually check for the correct time-frame.
+        if(submission.created_utc < start_date):
+            print("[NOT IN TIME-FRAME] " + str(submission.created_utc) + " < start_date: " + str(start_date))
+            continue
         ids.append(submission.id)
         names.append(submission.name)
         created.append(submission.created_utc)
