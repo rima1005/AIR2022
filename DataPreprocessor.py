@@ -21,7 +21,13 @@ def lemmatize(data):
 
 def remove_stopwords(data):
     stop_words = set(stopwords.words('english'))
-    return [word for word in data if not word.lower() in stop_words]
+    list = []
+    for word in data:
+        if not word.lower() in stop_words:
+            list.append(word)
+
+    return list
+    #return [word for word in data if not word.lower() in stop_words]
 
 
 def spell_checking(data):
@@ -35,9 +41,11 @@ def remove_punctuation(data):
 
 
 def preprocess(x, lemmatization=True, removeStopwords=True, spellChecking=True, removePunctuation=True):
+    print(F"Preprocess: {x}")
     data = word_tokenize(x)
     if spellChecking:
         data = spell_checking(data)
+        data = [word for word in data if not word is None]
     if removeStopwords:
         data = remove_stopwords(data)
     if removePunctuation:

@@ -3,6 +3,10 @@ import getopt
 import argparse
 import datetime
 from datetime import timezone
+import os
+import spacy
+import numpy as np
+from ast import literal_eval
 
 import Utils
 from RedditApiWrapper import RedditApiWrapper
@@ -43,37 +47,48 @@ def main():
     # ------------------------------------------------------------------------------------------------------------------
     # New Submissions
     # ------------------------------------------------------------------------------------------------------------------
-    data = api.getNewSubmissions(subreddits[0], timestamp, 5000)
-    data.to_csv("dataframes/praw_new_submissions.csv")
-    if Utils.debug:
-        print(data[Utils.col_title])
+    if not os.path.exists("dataframes/praw_new_submissions.csv"):
+        data = api.getNewSubmissions(subreddits[0], timestamp, 5000)
+        data.to_csv("dataframes/praw_new_submissions.csv")
+        if Utils.debug:
+            print(data[Utils.col_title])
 
     # ------------------------------------------------------------------------------------------------------------------
     # Hot Submissions
     # ------------------------------------------------------------------------------------------------------------------
-    hot_data = api.getHotSubmissions(subreddits[0], timestamp, 5000)
-    print(hot_data)
-    hot_data.to_csv("dataframes/praw_hot_submissions.csv")
-    if Utils.debug:
-        print(hot_data[Utils.col_title])
+    if not os.path.exists("dataframes/praw_new_submissions.csv"):
+        hot_data = api.getHotSubmissions(subreddits[0], timestamp, 5000)
+        print(hot_data)
+        hot_data.to_csv("dataframes/praw_hot_submissions.csv")
+        if Utils.debug:
+            print(hot_data[Utils.col_title])
     # Preprocess the title_column (reddits in consipratard subreddit only are allowed with link and therefore
     # there is no body but only a title
     # Preprocessing includes spell correction, stopword- and punctuation-removal and stemming
-    data[Utils.col_title_tokens] = data[Utils.col_title].apply(preprocess)
 
-    if Utils.debug:
-        print(data[Utils.col_title_tokens])
+    data = None
+    if os.path.exists("dataframes/praw_new_submissions.csv"):
+        data = pd.read_csv("dataframes/praw_new_submissions.csv")
 
-    data[Utils.col_title_token_string] = data[Utils.col_title_tokens].apply(lambda x: ' '.join(x))
+    if os.path.exists("dataframes/praw_new_submissions_preprocessed.csv"):
+        data = pd.read_csv("dataframes/praw_new_submissions.csv")
+    else:
+        data[Utils.col_title_tokens] = data[Utils.col_title].apply(preprocess)
 
-    if Utils.debug:
-        print(data[Utils.col_title_token_string])
+        if Utils.debug:
+            print(data[Utils.col_title_tokens])
 
-    vectorizer = TfidfVectorizer()
-    X = vectorizer.fit_transform(data[Utils.col_title_token_string].tolist())
+        data[Utils.col_title_token_string] = data[Utils.col_title_tokens].apply(lambda x: ' '.join(x))
 
-    openAi = OpenAiWrapper()
-    vectors = openAi.getEmbeddingVector(vectorizer.get_feature_names())
+        if Utils.debug:
+            print(data[Utils.col_title_token_string])
+
+        data.to_csv("dataframes/praw_new_submissions_preprocessed.csv")
+
+
+
+
+
 
     pass
 
