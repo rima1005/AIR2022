@@ -16,13 +16,14 @@ def convert_to_pandas(submissions: list, start_date):
                                           # Utils.col_comments,
                                           Utils.col_num_comments,
                                           Utils.col_author_id,
-                                          Utils.col_author_name
+                                          Utils.col_author_name,
+                                          Utils.col_subreddit,
                                           # Utils.col_author_submissions,
                                           # Utils.col_author_comments,
                                           ])
 
     ids, names, created, title, text, score, upvotes, over_18, comments, num_comments, \
-    author_ids, author_names, author_submissions, author_comments = [], [], [], [], [], [], [], [], [], [], [], [], [], []
+    author_ids, author_names, author_submissions, author_comments, col_subreddit = [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
 
     fullnames = [submission.name for submission in submissions]
 
@@ -53,13 +54,14 @@ def convert_to_pandas(submissions: list, start_date):
             print("[DELETED REDDITOR]")
             author_ids.append("none")
             author_names.append("none")
+            col_subreddit.append("none")
         else:
             print("[Redditor] " + str(author.name))
             author_ids.append("none")
             # author_ids.append(author.id)
             author_names.append(author.name)
-    # author_submissions.append(author.submissions)
-    # author_comments.append(author.comments)
+            col_subreddit.append(submission.subreddit)
+
 
     submission_df[Utils.col_id] = ids
     submission_df[Utils.col_name] = names
@@ -73,7 +75,8 @@ def convert_to_pandas(submissions: list, start_date):
     submission_df[Utils.col_num_comments] = num_comments
     submission_df[Utils.col_author_id] = author_ids
     submission_df[Utils.col_author_name] = author_names
-    # ubmission_df[Utils.col_author_submissions] = author_submissions
+    # submission_df[Utils.col_author_submissions] = author_submissions
     # submission_df[Utils.col_author_comments] = author_comments
+    submission_df[Utils.col_subreddit] = col_subreddit
 
     return submission_df

@@ -4,9 +4,12 @@ import argparse
 import datetime
 from datetime import timezone
 import os
-import spacy
+# import spacy
 import numpy as np
 from ast import literal_eval
+
+# for error handling - for http error - subreddit is private eg.
+from prawcore.exceptions import Forbidden
 
 import Utils
 from RedditApiWrapper import RedditApiWrapper
@@ -62,6 +65,43 @@ def main():
         hot_data.to_csv("dataframes/praw_hot_submissions.csv")
         if Utils.debug:
             print(hot_data[Utils.col_title])
+    # ------------------------------------------------------------------------------------------------------------------
+    #                                          SUBMISSIONS AND COMMENTS
+    #                                             of UNIQUE AUTHORS
+    # ------------------------------------------------------------------------------------------------------------------
+    unique_authors = pd.read_csv('dataframes/unique_authors.csv')
+    # ------------------------------------------------------------------------------------------------------------------
+    # SUBMISSIONS
+    # ------------------------------------------------------------------------------------------------------------------
+    if not os.path.exists("dataframes/praw_redditor_submissions.csv"):
+        redditor_subs = pd.DataFrame()
+        count = 1
+        for redditor in unique_authors['author_name']:
+            if Utils.debug:
+                print('Processing Submissions {} Redditor of {}.'.format(count, len(unique_authors['author_name'])))
+            # new_data = api.getNewSubmissionsOfRedditor(redditor, timestamp, 5000)
+            # pd.concat([redditor_subs, new_data])
+            hot_data = api.getHotSubmissionsOfRedditor(redditor, timestamp, 100)
+            redditor_subs = pd.concat([redditor_subs, hot_data])
+            print(redditor_subs)
+            count += 1
+        redditor_subs.to_csv("dataframes/praw_redditor_submissions.csv")
+    # ------------------------------------------------------------------------------------------------------------------
+    # COMMENTS - Might be to overkill
+    # ------------------------------------------------------------------------------------------------------------------
+    # if not os.path.exists("dataframes/praw_redditor_comments.csv"):
+    #     redditor_coms = pd.DataFrame()
+    #     count = 1
+    #     for redditor in unique_authors['author_name']:
+    #         if Utils.debug:
+    #             print('Processing Comments {} Redditor of {}.'.format(count, len(unique_authors['author_name'])))
+    #         # new_data = api.getNewCommentsOfRedditor(redditor, timestamp, 5000)
+    #         # pd.concat([redditor_coms, new_data])
+    #         hot_data = api.getHotCommentsOfRedditor(redditor, timestamp, 100)
+    #         redditor_coms = pd.concat([redditor_coms, hot_data])
+    #         print(redditor_coms)
+    #         count += 1
+    #     redditor_coms.to_csv("dataframes/praw_redditor_comments.csv")
     # Preprocess the title_column (reddits in consipratard subreddit only are allowed with link and therefore
     # there is no body but only a title
     # Preprocessing includes spell correction, stopword- and punctuation-removal and stemming
