@@ -9,6 +9,7 @@ from nltk.tokenize import word_tokenize
 from spellchecker import SpellChecker
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
+import numpy as np
 
 spell = SpellChecker()
 ss = SnowballStemmer(language='english')
@@ -54,6 +55,12 @@ def preprocess(x, lemmatization=True, removeStopwords=True, spellChecking=True, 
         data = lemmatize(data)
 
     return [word for word in data if len(word) > 0]
+
+def replaceNan(x):
+    if x == np.nan:
+        return list()
+    else:
+        return x
 
 def stringify(x):
     ' '.join(x)
