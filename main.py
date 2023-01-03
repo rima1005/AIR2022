@@ -15,6 +15,7 @@ import Utils
 from RedditApiWrapper import RedditApiWrapper
 from OpenAiWrapper import OpenAiWrapper
 from DataPreprocessor import preprocess
+from DataPreprocessor import replaceNan
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 
@@ -125,6 +126,34 @@ def main():
 
         data.to_csv("dataframes/praw_new_submissions_preprocessed.csv")
 
+
+    if os.path.exists("dataframes/praw_hot_submissions.csv"):
+        data = pd.read_csv("dataframes/praw_hot_submissions.csv")
+
+    if os.path.exists("dataframes/praw_hot_submissions_preprocessed.csv"):
+        data = pd.read_csv("dataframes/praw_hot_submissions_preprocessed.csv")
+    else:
+        data[Utils.col_title_tokens] = data[Utils.col_title].apply(preprocess)
+
+        if Utils.debug:
+            print(data[Utils.col_title_tokens])
+
+        data[Utils.col_title_token_string] = data[Utils.col_title_tokens].apply(lambda x: ' '.join(x))
+
+        if Utils.debug:
+            print(data[Utils.col_title_token_string])
+
+        data.to_csv("dataframes/praw_hot_submissions_preprocessed.csv")
+
+    vectorizer = TfidfVectorizer()
+    data[Utils.col_title_token_string] = data[Utils.col_title_token_string].replace(np.nan, '')
+    data[Utils.col_title_tokens] = data[Utils.col_title_tokens].apply(replaceNan)
+    X = vectorizer.fit_transform(data[Utils.col_title_token_string].tolist())
+
+    openAi = OpenAiWrapper()
+    print(len(vectorizer.get_feature_names()))
+    print(vectorizer.get_feature_names()[2045:2050])
+    vectors = openAi.getEmbeddingVector(vectorizer.get_feature_names())
 
 
 

@@ -2,6 +2,7 @@ import openai
 import Utils
 import pandas as pd
 import numpy as np
+import math
 
 class OpenAiWrapper(object):
     def __new__(cls):
@@ -31,19 +32,28 @@ class OpenAiWrapper(object):
 
     # Todo: Max request size for tokens is 8192 --> split tokens accordingly and make multiple requests!
     def getEmbeddingVector(self, tokens):
-        if len(tokens) > 8192:
-            assert(False, 'See Todo!!!')
 
-        embeddings = openai.Embedding.create(engine=self.engine_id, input=tokens)
+        num_requests = int(math.ceil(len(tokens) / 2048))
+        request_data = []
+        for i in range(num_requests):
+            if (i + 1) * 2048 > len(tokens):
+                request_data.append(tokens[(i)*2048:])
+            else:
+                request_data.append(tokens[(i)*2048:(i+1)*2048])
+
+        responses = []
+        for data in request_data:
+            response = openai.Embedding.create(engine=self.engine_id, input=data)
+            responses.append(response)
 
         temp_values = []
         temp_tokens = []
-
-        for embedding in embeddings['data']:
-            idx = embedding['index']
-            value = embedding['embedding']
-            temp_tokens.append(tokens[idx])
-            temp_values.append(np.array(value))
+        for embeddings in responses:
+            for embedding in embeddings['data']:
+                idx = embedding['index']
+                value = embedding['embedding']
+                temp_tokens.append(tokens[idx])
+                temp_values.append(np.array(value))
 
         result = pd.DataFrame(columns=[Utils.col_embedd_token, Utils.col_embedd_values])
         result[Utils.col_embedd_token] = temp_tokens
