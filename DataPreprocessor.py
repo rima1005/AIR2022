@@ -42,7 +42,9 @@ def remove_punctuation(data):
 
 
 def preprocess(x, lemmatization=True, removeStopwords=True, spellChecking=True, removePunctuation=True):
-    print(F"Preprocess: {x}")
+    if x is np.nan:
+        return ''
+    #print(F"Preprocess: {x}")
     data = word_tokenize(x)
     if spellChecking:
         data = spell_checking(data)

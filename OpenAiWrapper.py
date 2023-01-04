@@ -49,9 +49,9 @@ class OpenAiWrapper(object):
         temp_values = []
         temp_tokens = []
         embedding_length = None
-        for embeddings in responses:
+        for count, embeddings in enumerate(responses):
             for embedding in embeddings['data']:
-                idx = embedding['index']
+                idx = embedding['index'] + (count * 2048)
                 value = embedding['embedding']
                 temp_tokens.append(tokens[idx])
                 if embedding_length is None:

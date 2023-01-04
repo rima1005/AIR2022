@@ -144,18 +144,24 @@ def main():
         data = pd.read_csv("dataframes/praw_hot_submissions_preprocessed.csv")
     else:
         data[Utils.col_title_tokens] = data[Utils.col_title].apply(preprocess)
+        data[Utils.col_text_tokens] = data[Utils.col_text].apply(preprocess)
 
         if Utils.debug:
             print(data[Utils.col_title_tokens])
 
         data[Utils.col_title_token_string] = data[Utils.col_title_tokens].apply(lambda x: ' '.join(x))
+        data[Utils.col_text_token_string] = data[Utils.col_text_tokens].apply(lambda x: ' '.join(x))
+
+        data[Utils.col_title_token_string] = data[Utils.col_title_token_string].replace(np.nan, '')
+        data[Utils.col_text_token_string] = data[Utils.col_text_token_string].replace(np.nan, '')
+
+        data[Utils.col_title_tokens] = data[Utils.col_title_tokens].apply(replaceNan)
+        data[Utils.col_text_tokens] = data[Utils.col_text_tokens].apply(replaceNan)
 
         if Utils.debug:
             print(data[Utils.col_title_token_string])
 
         data.to_csv("dataframes/praw_hot_submissions_preprocessed.csv")
-
-
 
     pass
 
