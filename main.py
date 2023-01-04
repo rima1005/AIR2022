@@ -66,6 +66,16 @@ def main():
         hot_data.to_csv("dataframes/praw_hot_submissions.csv")
         if Utils.debug:
             print(hot_data[Utils.col_title])
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Comments of the top 100 hot submissions
+    # ------------------------------------------------------------------------------------------------------------------
+    if not os.path.exists("dataframes/praw_hot_comments.csv"):
+        hot_data = pd.read_csv('dataframes/praw_hot_submissions.csv')
+        hot_comments = api.getHotCommentsOfSubmissions(hot_data, 100)
+        hot_comments.to_csv("dataframes/praw_hot_comments.csv")
+        if Utils.debug:
+            print(hot_comments)
     # ------------------------------------------------------------------------------------------------------------------
     #                                          SUBMISSIONS AND COMMENTS
     #                                             of UNIQUE AUTHORS

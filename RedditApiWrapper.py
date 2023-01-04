@@ -1,9 +1,11 @@
+import pandas as pd
 import praw
 from DataAdapter import convert_to_pandas
 import Utils
 
-#importing our error - for http error - subreddit is private eg.
+# importing our error - for http error - subreddit is private eg.
 from prawcore.exceptions import Forbidden
+
 
 class RedditApiWrapper(object):
     def __new__(cls):
@@ -62,7 +64,7 @@ class RedditApiWrapper(object):
         redditor = self.reddit.redditor(redditor_name)
         try:
             for submission in self.reddit.redditor(str(redditor)).submissions.hot(limit=limit):
-                #print(submission.subreddit)
+                # print(submission.subreddit)
                 submissions.append(submission)
             if Utils.debug:
                 print('{} hottest submissions for {} retrieved'.format(len(submissions), redditor))
@@ -96,3 +98,24 @@ class RedditApiWrapper(object):
             print("---------------\nError Handling! Comments\n---------------")
             print(e)
         return convert_to_pandas(comments, start_date)
+
+    def getHotCommentsOfSubmissions(self, submissions, limit):
+        sorted_submissions = submissions.sort_values("num_comments", ascending=False)
+        submission_comments = {}
+        for index, submission in sorted_submissions[0:limit].iterrows():
+            submission_obj = self.reddit.submission(str(submission["id"]))
+            comments = []
+            try:
+                submission_obj.comments.replace_more(limit=0)
+                for top_level_comment in submission_obj.comments:
+                    print(top_level_comment.body)
+                    comments.append(top_level_comment.body)
+                submission_comments[submission["id"]] = str(comments)
+            except Exception as e:
+                print("---------------\nError Handling! Comments\n---------------")
+                print(e)
+
+        if Utils.debug:
+            print('{} comments for submissions retrieved'.format(len(comments)))
+
+        return pd.DataFrame.from_dict(submission_comments, orient='index')
