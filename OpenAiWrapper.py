@@ -30,7 +30,7 @@ class OpenAiWrapper(object):
                 except:
                     self.engine_id = None
 
-    # Todo: Max request size for tokens is 8192 --> split tokens accordingly and make multiple requests!
+    # Todo: Max request size for tokens is 2048 --> split tokens accordingly and make multiple requests!
     def getEmbeddingVector(self, tokens):
 
         num_requests = int(math.ceil(len(tokens) / 2048))
@@ -48,16 +48,19 @@ class OpenAiWrapper(object):
 
         temp_values = []
         temp_tokens = []
+        embedding_length = None
         for embeddings in responses:
             for embedding in embeddings['data']:
                 idx = embedding['index']
                 value = embedding['embedding']
                 temp_tokens.append(tokens[idx])
+                if embedding_length is None:
+                    embedding_length = len(np.array(value))
                 temp_values.append(np.array(value))
 
-        result = pd.DataFrame(columns=[Utils.col_embedd_token, Utils.col_embedd_values])
+        temp_values_np = np.array(temp_values)
+        result = pd.DataFrame(temp_values_np)
         result[Utils.col_embedd_token] = temp_tokens
-        result[Utils.col_embedd_values] = temp_values
 
         result.set_index(Utils.col_embedd_token, inplace=True)
         return result

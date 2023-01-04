@@ -145,18 +145,6 @@ def main():
 
         data.to_csv("dataframes/praw_hot_submissions_preprocessed.csv")
 
-    vectorizer = TfidfVectorizer()
-    data[Utils.col_title_token_string] = data[Utils.col_title_token_string].replace(np.nan, '')
-    data[Utils.col_title_tokens] = data[Utils.col_title_tokens].apply(replaceNan)
-    X = vectorizer.fit_transform(data[Utils.col_title_token_string].tolist())
-
-    openAi = OpenAiWrapper()
-    print(len(vectorizer.get_feature_names()))
-    print(vectorizer.get_feature_names()[2045:2050])
-    vectors = openAi.getEmbeddingVector(vectorizer.get_feature_names())
-
-
-
 
 
     pass
